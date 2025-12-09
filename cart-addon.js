@@ -5,11 +5,14 @@ Author: David Choe – AJAX transport stub owner (ENABLE_AJAX + sendCart), frien
 */
 
 (() => {
+  // Team 3: shared base URL for our NodeJS API
+  const API_BASE = 'https://130.203.136.203:3003';
+
   // Thomas: this flag stays false because our REST API will be built later in another assignment.
-  const ENABLE_AJAX = false;
+  const ENABLE_AJAX = true;
 
   // David: when the API exists we will POST our cart JSON here (for now it is a placeholder).
-  const AJAX_ENDPOINT = "/api/cart";
+  const AJAX_ENDPOINT = API_BASE + '/api/cart';
 
   // David: we pad IDs so they show like 001 and 004 to match the example screenshot format.
   const PAD_IDS_TO = 3;
@@ -164,21 +167,39 @@ Author: David Choe – AJAX transport stub owner (ENABLE_AJAX + sendCart), frien
     }));
   }
 
-  // David: AJAX transport stub owner — later we will enable this to POST to the Node service.
+  // David: AJAX transport stub owner — now we actually POST the cart in an object wrapper so MongoDB insertOne() is happy.
   async function sendCart(collection) {
     if (!ENABLE_AJAX) {
       $("#ajaxMsg").text("AJAX disabled (assignment stub). Turn ENABLE_AJAX=true when your API is ready.");
       return;
     }
+
+    // Thomas: wrap the array of cart items in an object so the backend sees a single document, not a raw array.
+    const payload = {
+      createdAt: new Date().toISOString(),
+      items: collection
+    };
+
+    console.log("Sending cart payload to API:", payload);
+
     try {
       const res = await fetch(AJAX_ENDPOINT, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(collection)
+        body: JSON.stringify(payload)
       });
+
       const txt = await res.text();
+      console.log("Cart API raw response:", res.status, txt);
+
+      if (!res.ok) {
+        $("#ajaxMsg").text(`Server error: ${res.status} ${txt}`);
+        return;
+      }
+
       $("#ajaxMsg").text(`Server responded: ${res.status} ${txt}`);
     } catch (e) {
+      console.error("Cart POST failed:", e);
       $("#ajaxMsg").text(`AJAX error: ${e}`);
     }
   }
@@ -233,11 +254,11 @@ Author: David Choe – AJAX transport stub owner (ENABLE_AJAX + sendCart), frien
       $("#jsonOut").text("");
     });
 
-    // Jaden + David: Checkout prints the cart JSON array and (optionally) posts it (AJAX stub).
+    // Jaden + David: Checkout prints the cart JSON array and posts it to the API.
     $("#btnSend").on("click", function () {
       const items = cartItemsArray();
       showJSON(items);     // prints the nice array into the JSON box
-      sendCart(items);     // stays disabled unless we flip ENABLE_AJAX
+      sendCart(items);     // now sends an object { createdAt, items: [...] } so MongoDB is happy
     });
   });
 })();

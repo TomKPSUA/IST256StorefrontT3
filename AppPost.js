@@ -1,6 +1,6 @@
 // AppPost.js
 // Simple HTTPS + Express + MongoDB API for IST 256 Storefront
-// Thomas Koltes, Jaden Reyes, David Choe – Team 3 (example names)
+// Thomas Koltes, Jaden Reyes, David Choe
 
 // Pull in the node modules we need.
 const express = require('express');

@@ -20,6 +20,10 @@ function setValid($input) {
 const priceRegex = /^\d+(?:\.\d{1,2})?$/;      // numbers with optional .00
 const weightRegex = /^(?:\s*|[\w\d\.\-\s]+)$/; // blank OR letters/numbers/spaces
 
+// Team 3: base URL for NodeJS API used when sending product JSON.
+// NOTE: update the port if your team uses something other than 3003.
+const API_BASE = 'https://130.203.136.203:3003';
+
 $(function () {
   // Thomas Koltes: Grab the main nodes we work with.
   const $form = $("#productForm");
@@ -104,7 +108,7 @@ $(function () {
     $jsonCard.removeClass("d-none");
   }
 
-  // ---- submit handler: validate, store in memory, then show JSON ----
+  // ---- submit handler: validate, store in memory, then show JSON + POST to API ----
   $form.on("submit", function (e) {
     e.preventDefault(); // Jaden Reyes: stop real submit so we can control UI
 
@@ -127,8 +131,19 @@ $(function () {
     $success.removeClass("d-none");
     showJSON(doc);
 
-    // Later: real AJAX to NodeJS REST API (not part of this step)
-    // $.ajax({ ... });
+    // Thomas Koltes: Live POST to our NodeJS API so the product JSON lands in the "products" collection.
+    fetch(API_BASE + '/api/products', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(doc)
+    })
+    .then(function(res){ return res.json(); })
+    .then(function(data){
+      console.log('Product POST ok:', data);
+    })
+    .catch(function(err){
+      console.error('Product POST failed:', err);
+    });
   });
 
   // ---- small Search/Update utilities on the right panel ----
