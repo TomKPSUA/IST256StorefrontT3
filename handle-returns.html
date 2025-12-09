@@ -15,21 +15,28 @@
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular.min.js"></script>
 
-  <!-- Thomas K: Bootstrap JS bundle for any interactive pieces we might add later (not strictly required here). -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-  <!-- Jaden R: same app file as the billing page so both pages share one Angular module. -->
+  <!-- Team Script: this file defines BillingCtrl and ReturnsCtrl used by this page. -->
   <script src="app.js"></script>
 </head>
-<body ng-controller="ReturnsCtrl as vm" class="bg-light">
-  <!-- David C: Navbar repeated so navigation is consistent across both required pages and the main storefront. -->
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+<body ng-controller="ReturnsCtrl as vm">
+
+  <!-- Simple shared navbar so every page has navigation links (assignment requirement). -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-3">
     <div class="container-fluid">
-      <a class="navbar-brand" href="#">Team Storefront</a>
-      <div class="navbar-nav">
-        <a class="nav-link" href="billing-details.html">Billing Details</a>
-        <a class="nav-link active" href="handle-returns.html">Handle Returns</a>
-        <a class="nav-link" href="./index.html">Back to Storefront</a>
+      <a class="navbar-brand" href="index.html">Storefront</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain"
+        aria-controls="navMain" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navMain">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item"><a class="nav-link" href="shopper-management.html">Shopper</a></li>
+          <li class="nav-item"><a class="nav-link" href="product.html">Products</a></li>
+          <li class="nav-item"><a class="nav-link" href="shoppingcart.html">Cart</a></li>
+          <li class="nav-item"><a class="nav-link" href="shipping-selection.html">Shipping</a></li>
+          <li class="nav-item"><a class="nav-link" href="billing-details.html">Billing</a></li>
+          <li class="nav-item"><a class="nav-link active" href="handle-returns.html">Returns</a></li>
+        </ul>
       </div>
     </div>
   </nav>
@@ -69,21 +76,24 @@
       </div>
     </div>
 
-    <!-- Jaden R: a basic table to show what’s in the return cart, which is the data we’ll package into JSON. -->
-    <hr class="my-4">
-    <h2 class="h5">Return Cart</h2>
-    <div class="table-responsive">
-      <table class="table table-striped">
+    <!-- David C: table showing the current items that will be part of the returns JSON payload. -->
+    <div class="table-responsive mt-4" ng-if="vm.returns.length">
+      <table class="table table-striped align-middle">
         <thead>
-          <tr><th>Product</th><th>SKU</th><th>Qty</th><th>Reason</th><th></th></tr>
+          <tr>
+            <th>SKU</th>
+            <th>Product</th>
+            <th>Qty</th>
+            <th>Reason</th>
+            <th></th>
+          </tr>
         </thead>
         <tbody>
           <tr ng-repeat="r in vm.returns">
-            <td>{{ r.name }}</td>
             <td>{{ r.sku }}</td>
+            <td>{{ r.name }}</td>
             <td>{{ r.qty }}</td>
             <td>{{ r.reason }}</td>
-            <!-- David C: remove by index because that’s the simplest way to delete a single row for beginners. -->
             <td><button class="btn btn-sm btn-danger" ng-click="vm.removeReturn($index)">Remove</button></td>
           </tr>
         </tbody>
@@ -95,14 +105,19 @@
       <button class="btn btn-primary" ng-click="vm.submitReturns()">Submit Returns (Show JSON)</button>
       <button class="btn btn-outline-secondary" ng-click="vm.clearAll()">Clear All</button>
     </div>
+    <!-- Live status from the controller so users see if the POST succeeded or failed. -->
+    <div class="alert alert-secondary py-2" role="status" ng-if="vm.status">
+      {{ vm.status }}
+    </div>
 
     <!-- Jaden R: JSON preview area so the TA can see exactly what the payload looks like after clicking submit. -->
     <h2 class="h6">Returns JSON Preview</h2>
     <pre id="returnsJson" class="codebox p-3 rounded border">{ /* add items and click Submit to see JSON */ }</pre>
 
-    <!-- David C: later when the NodeJS API exists, we will POST this to /api/returns using Angular $http or jQuery. -->
+    <!-- David C: this page now POSTs the same JSON payload to /api/returns on our NodeJS API for grading. -->
     <div class="alert alert-info mt-3" role="alert">
-      Planned: POST returns JSON to <code>/api/returns</code> when the NodeJS API is available.
+      This page builds a JSON payload and POSTs it to <code>/api/returns</code> on the NodeJS API,
+      while also showing the same JSON in the preview box above.
     </div>
   </div>
 </body>

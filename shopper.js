@@ -5,6 +5,10 @@
 */
 
 /* Jaden Reyes: Wait until DOM is ready so all elements exist before we query them. */
+
+// Team 3: Base URL for NodeJS API so shopper data can be saved.
+const API_BASE = 'https://130.203.136.203:3003';
+
 document.addEventListener("DOMContentLoaded", () => {
   /* Jaden Reyes: Cache important nodes for validation and output display. */
   const form = document.getElementById("shopperForm");
@@ -114,5 +118,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
     /* David Choe: Print JSON for readability inside the <pre> block. */
     jsonOutput.textContent = JSON.stringify(shopper, null, 2);
+
+// Jaden Reyes: POST shopper JSON to our NodeJS API so it lands in the "shopper" collection.
+fetch(API_BASE + '/api/shopper', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify(shopper)
+})
+.then(function(res){ return res.json(); })
+.then(function(data){
+  console.log('Shopper POST ok:', data);
+})
+.catch(function(err){
+  console.error('Shopper POST failed:', err);
+});
   });
 });
